@@ -1,9 +1,12 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:129.0) Gecko/20100101 Firefox/129.0" version="24.7.6">
   <diagram name="Page-1" id="4bpVQHCz979mSyAzAPYk">
-    <mxGraphModel dx="1182" dy="460" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1693" pageHeight="945" background="#ffffff" math="0" shadow="0">
+    <mxGraphModel dx="2449" dy="1198" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1693" pageHeight="945" background="#ffffff" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="3M7Vr9DxULC0OH6YLq8r-147" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;Paddock 1 - Cluster of Real Time Soil Moisture Monitoring Systems&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;opacity=40;dashed=1;dashPattern=12 12;labelPosition=center;verticalLabelPosition=top;align=center;verticalAlign=bottom;" vertex="1" parent="1">
+          <mxGeometry x="10" y="70" width="910" height="740" as="geometry" />
+        </mxCell>
         <mxCell id="3M7Vr9DxULC0OH6YLq8r-95" value="Cloud" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;opacity=40;dashed=1;dashPattern=12 12;labelPosition=center;verticalLabelPosition=top;align=center;verticalAlign=bottom;" vertex="1" parent="1">
           <mxGeometry x="938" y="112" width="500" height="430" as="geometry" />
         </mxCell>
@@ -134,7 +137,7 @@
         <mxCell id="3M7Vr9DxULC0OH6YLq8r-75" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="3M7Vr9DxULC0OH6YLq8r-79" target="3M7Vr9DxULC0OH6YLq8r-9">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="3M7Vr9DxULC0OH6YLq8r-76" value="&lt;div&gt;Soil Moisture IoT System X - In Paddock X&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;opacity=40;dashed=1;dashPattern=12 12;labelPosition=center;verticalLabelPosition=middle;align=center;verticalAlign=middle;" vertex="1" parent="1">
+        <mxCell id="3M7Vr9DxULC0OH6YLq8r-76" value="&lt;div&gt;Soil Moisture IoT System X - In Paddock 1&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;opacity=40;dashed=1;dashPattern=12 12;labelPosition=center;verticalLabelPosition=middle;align=center;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="413" y="650" width="248" height="90" as="geometry" />
         </mxCell>
         <mxCell id="3M7Vr9DxULC0OH6YLq8r-78" value="&lt;div&gt;Soil Moisture IoT System 3 - In Paddock 1&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;opacity=40;dashed=1;dashPattern=12 12;labelPosition=center;verticalLabelPosition=middle;align=center;verticalAlign=middle;" vertex="1" parent="1">
@@ -171,7 +174,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="3M7Vr9DxULC0OH6YLq8r-101" value="&lt;div&gt;Farmer&lt;/div&gt;&lt;div&gt;deploys Soil Moisture IoT Systems on Paddocks&lt;/div&gt;" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn0.iconfinder.com/data/icons/kameleon-free-pack/110/Farmer-128.png" vertex="1" parent="1">
-          <mxGeometry x="285" y="749" width="128" height="128" as="geometry" />
+          <mxGeometry x="297" y="796" width="104" height="104" as="geometry" />
         </mxCell>
         <mxCell id="3M7Vr9DxULC0OH6YLq8r-104" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.531;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#97D077;" edge="1" parent="1" source="3M7Vr9DxULC0OH6YLq8r-101" target="3M7Vr9DxULC0OH6YLq8r-30">
           <mxGeometry relative="1" as="geometry" />
@@ -179,7 +182,7 @@
         <mxCell id="3M7Vr9DxULC0OH6YLq8r-108" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.536;entryY=0.979;entryDx=0;entryDy=0;entryPerimeter=0;strokeColor=#97D077;" edge="1" parent="1" source="3M7Vr9DxULC0OH6YLq8r-101" target="3M7Vr9DxULC0OH6YLq8r-76">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="546" y="812" />
+              <mxPoint x="546" y="842" />
             </Array>
           </mxGeometry>
         </mxCell>
