@@ -4,7 +4,7 @@
 
 We conducted a STRIDE Analysis with a focus on breadth rather than depth, as we are in our project planning phase.
 
-We segemented our analysis based on two key attributes, first attribute is Risk level based on impact of a vulnerability being exploited i.e. criticality of system component and asset value and likelihood of occurence. Our second attribute is based on when we need to actually ensure the threat is addressed and tested. 
+We segmented our analysis based on two key attributes, first attribute is Risk level based on impact of a vulnerability being exploited i.e. criticality of system component and asset value and likelihood of occurrence. Our second attribute is based on when we need to actually ensure the threat is addressed and tested. 
 
 Although our client has not made security their priority, we will provide them the STRIDE analysis with our recommendations so that threats out of our control in our System Design this phase such as Spoofing or Physical Tampering are communicated. Our client can decide on whether they want to resolve this issue and if it's a priority for their needs.
 
