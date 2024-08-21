@@ -1,12 +1,12 @@
-# STRIDE Analysis
+# Preliminary STRIDE Analysis
 
-### Approach
+### Approach and Considerations
 
 We conducted a STRIDE Analysis with a focus on breadth rather than depth, as we are in our project planning phase.
 
 We segemented our analysis based on two key attributes, first attribute is Risk level based on impact of a vulnerability being exploited i.e. criticality of system component and asset value and likelihood of occurence. Our second attribute is based on when we need to actually ensure the threat is addressed and tested. 
 
-Although our client has not made security their priority, we will provide them the STRIDE analysis with our recommendations so that threats out of our control in our System Design this phase such as Spoofing or Physical Tampering are communicated. Our client can make a decision on whether they want to resolve this issue and if its a priority for their needs.
+Although our client has not made security their priority, we will provide them the STRIDE analysis with our recommendations so that threats out of our control in our System Design this phase such as Spoofing or Physical Tampering are communicated. Our client can decide on whether they want to resolve this issue and if it's a priority for their needs.
 
 As seen in our solution component diagram and description of our solution, we plan on implementing good communication methods for data in transit such as using MQTT, HTTPS and OAuth 2.0 and secure long-term storage on AWS Cloud Platform.
 
@@ -22,4 +22,6 @@ As seen in our solution component diagram and description of our solution, we pl
 | **Elevation of Privilege** | An attacker could exploit a vulnerability in the John Deere Platform to gain unauthorized administrative privileges.                                   | Disruption of operations or access to sensitive data.                                                                      | Low            | **Mitigate** - Apply strict access control, regularly patch vulnerabilities, and enforce the principle of least privilege.                                                     | **Current Phase**         |
 
 ### Conclusion
-Ultimately, as IoT devices are resource constrained, security implmentation in our design is limited. We also have to consider things out of our control such as $0 budget that limits our ability to solve certain issues using the most effective methods such a third party Denial of Service Protection or Physical Security Housing for devices to ensure IoT devices are secure.
+We will review the diagram again at a later stage in the project for our individual assessment. Reviewing our preliminary STRIDE analysis will be helpful as our System Components may change. 
+
+Ultimately, as IoT devices are resource constrained, implementation of robust information security techniques listed in [OWASP](https://owasp.org/www-community/Threat_Modeling_Process) in our design is limited. We also considered other constraints out of our control such as $0 budget that limits our ability to solve certain issues using the most effective methods such a third party Denial of Service Protection or Physical Security Housing for devices to ensure IoT devices are secure.
