@@ -1,4 +1,4 @@
-#include <LoRa.h>
+gitup：#include <LoRa.h>
 #include "LoRaBoards.h"
 #include <TinyGPS++.h>
  
@@ -11,7 +11,7 @@
 #ifndef CONFIG_RADIO_BW
 #define CONFIG_RADIO_BW             125.0
 #endif
-
+ 
 // data structure to send over LoRa
 struct SensorData
 {
@@ -25,7 +25,7 @@ void readData(SensorData &sensorData) {
     sensorData.moisture_sensor_values[0] = 123; // Example reading
     sensorData.moisture_sensor_values[1] = 321; // Example reading
     sensorData.moisture_sensor_values[2] = 456; // Example reading
-
+ 
 }
  
 void setup()
@@ -77,9 +77,9 @@ void loop()
     if (i == 2) dataString += "]";
     if (i < 2) dataString += ",";
   }
-
+ 
   readData(sensorData, boardData);
-
+ 
   // Print the data string to the console
   Serial.print("Sending packet: ");
   Serial.println(dataString);
@@ -88,6 +88,7 @@ void loop()
   LoRa.beginPacket();
   LoRa.print(dataString);
   LoRa.endPacket();
-
+ 
   delay(2000);
 }
+ 
