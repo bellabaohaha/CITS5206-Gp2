@@ -49,7 +49,7 @@ const int sensorPin3 = 15;  // Sensor at 30cm
 const int dry = 2935;  // Value for dry sensor
 const int wet = 1350;  // Value for wet sensor
 
-// Sleep duration in seconds (set to 60 for 1 minute)
+// Sleep duration in seconds (initially set to 60 for testing purposes)
 const time_t sleepDuration = 60;  // Sleep duration in seconds
 
 // Variables to store soil moisture readings
@@ -60,6 +60,13 @@ RTC_DATA_ATTR int percentageHumidity3 = 0;
 // Variables to store last known GPS coordinates
 RTC_DATA_ATTR float lastLatitude = 0.0;
 RTC_DATA_ATTR float lastLongitude = 0.0;
+
+// Variables to track last time synchronization
+RTC_DATA_ATTR time_t lastSyncTime = 0;
+const time_t syncInterval = 86400;  // Sync time every 24 hours
+
+// Scheduled times for soil moisture readings (in minutes since midnight)
+const int scheduledTimes[] = { (17 * 60) + 13, (17 * 60) + 17 }; // 17:10  and 17:13 
 
 void setup() {
   Serial.begin(115200);
@@ -80,12 +87,23 @@ void setup() {
     // Woke up from deep sleep
     Serial.println("Woke up from deep sleep");
     initPeripheralsForReadings();
-    takeSoilMoistureReadings();
-    createAndPrintPayload();  // Create and print the payload after readings
+
+    // Check if it's time to take a reading
+    if (isScheduledTime()) {
+      takeSoilMoistureReadings();
+      createAndPrintPayload();  // Create and print the payload after readings
+    } else {
+      Serial.println("Not a scheduled time. Going back to sleep.");
+    }
+
+    // Calculate time until next scheduled reading
+    time_t sleepTime = getTimeUntilNextScheduledReading();
+
     Serial.print("Going to sleep for ");
-    Serial.print(sleepDuration);
+    Serial.print(sleepTime);
     Serial.println(" seconds.");
-    esp_sleep_enable_timer_wakeup(sleepDuration * 1000000LL);
+
+    esp_sleep_enable_timer_wakeup(sleepTime * 1000000LL);
     esp_deep_sleep_start();
   } else {
     // Power-on reset
@@ -131,16 +149,32 @@ void loop() {
 
       // Sync GPS time with ESP32 RTC
       syncTimeWithRTC();  // Sync with RTC
+
+      // Update last sync time
+      lastSyncTime = time(NULL);
+
+      // Calculate time until next scheduled reading
+      time_t sleepTime = getTimeUntilNextScheduledReading();
+
+      Serial.print("Going to sleep for ");
+      Serial.print(sleepTime);
+      Serial.println(" seconds.");
+
+      esp_sleep_enable_timer_wakeup(sleepTime * 1000000LL);
+      esp_deep_sleep_start();
     }
   }
 
   // After GPS is turned off and time is synced, enter deep sleep
   if (!gpsOn && gpsDataReceived) {
     // GPS is off, and we have GPS data (including time synced)
+    time_t sleepTime = getTimeUntilNextScheduledReading();
+
     Serial.print("Going to sleep for ");
-    Serial.print(sleepDuration);
+    Serial.print(sleepTime);
     Serial.println(" seconds.");
-    esp_sleep_enable_timer_wakeup(sleepDuration * 1000000LL);
+
+    esp_sleep_enable_timer_wakeup(sleepTime * 1000000LL);
     esp_deep_sleep_start();
   }
 
@@ -437,9 +471,67 @@ void createAndPrintPayload() {
   Serial.println(payload);
 }
 
-// Modified getTimeUntilNextReading() function
-time_t getTimeUntilNextReading() {
-  // For testing purposes, sleep for 60 seconds
-  return sleepDuration;
+bool isScheduledTime() {
+  // Get current time
+  time_t now;
+  struct tm timeinfo;
+  time(&now);
+  localtime_r(&now, &timeinfo);
+
+  // Convert current time to minutes since midnight
+  int currentMinutes = timeinfo.tm_hour * 60 + timeinfo.tm_min;
+
+  // Check if current time matches any scheduled time
+  for (int i = 0; i < sizeof(scheduledTimes) / sizeof(scheduledTimes[0]); i++) {
+    if (currentMinutes == scheduledTimes[i]) {
+      return true;
+    }
+  }
+
+  return false;
 }
+
+time_t getTimeUntilNextScheduledReading() {
+  // Get current time
+  time_t now;
+  struct tm timeinfo;
+  time(&now);
+  localtime_r(&now, &timeinfo);
+
+  // Convert current time to minutes since midnight
+  int currentMinutes = timeinfo.tm_hour * 60 + timeinfo.tm_min;
+
+  // Find the next scheduled time
+  int minutesUntilNext = 0;
+  bool found = false;
+  for (int i = 0; i < sizeof(scheduledTimes) / sizeof(scheduledTimes[0]); i++) {
+    if (scheduledTimes[i] > currentMinutes) {
+      minutesUntilNext = scheduledTimes[i] - currentMinutes;
+      found = true;
+      break;
+    }
+  }
+
+  // If no future scheduled time today, calculate time until the first scheduled time tomorrow
+  if (!found) {
+    minutesUntilNext = (24 * 60 - currentMinutes) + scheduledTimes[0];
+  }
+
+  // Calculate seconds until next scheduled time
+  time_t secondsUntilNext = minutesUntilNext * 60;
+
+  // Check if it's time to resync time via GPS (once a day)
+  time_t timeSinceLastSync = time(NULL) - lastSyncTime;
+  if (timeSinceLastSync >= syncInterval) {
+    // Resync time via GPS
+    gpsOn = true;
+    gpsDataReceived = false;
+    Serial.println("Time to resync time via GPS.");
+    // Set sleep time to 10 seconds to allow GPS to acquire data
+    return 10;
+  }
+
+  return secondsUntilNext;
+}
+
 
