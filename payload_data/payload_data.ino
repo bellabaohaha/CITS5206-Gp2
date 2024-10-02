@@ -6,6 +6,25 @@
 #include "boards.h"
 #include "esp_sleep.h"
 
+
+#include <LoRa.h>
+#include "LoRaBoards.h"
+
+#ifndef CONFIG_RADIO_FREQ
+#define CONFIG_RADIO_FREQ           915.0
+#endif
+#ifndef CONFIG_RADIO_OUTPUT_POWER
+#define CONFIG_RADIO_OUTPUT_POWER   17
+#endif
+#ifndef CONFIG_RADIO_BW
+#define CONFIG_RADIO_BW             125.0
+#endif
+
+
+
+
+
+
 // GPS object
 TinyGPSPlus gps;
 HardwareSerial gpsSerial(1);  // Renamed from GPS to gpsSerial
@@ -66,11 +85,12 @@ RTC_DATA_ATTR time_t lastSyncTime = 0;
 const time_t syncInterval = 86400;  // Sync time every 24 hours
 
 // Scheduled times for soil moisture readings (in minutes since midnight)
-const int scheduledTimes[] = { (17 * 60) + 35, (17 * 60) + 37 }; // 17:10  and 17:13 
+const int scheduledTimes[] = { (18 * 60) + 47, (18 * 60) + 49 }; // 17:10  and 17:13 
 
 void setup() {
   Serial.begin(115200);
 
+  initializeLoRa();
   // Replace delay with a non-blocking wait
   unsigned long startTime = millis();
   while (millis() - startTime < 5000) {
@@ -462,6 +482,14 @@ void createAndPrintPayload() {
   // Print the payload to Serial Monitor
   Serial.print("Payload: ");
   Serial.println(payload);
+  initializeLoRa();
+
+  Serial.println("Sending payload over LoRa...");
+  LoRa.beginPacket();
+  LoRa.print(payload);
+  LoRa.endPacket();
+  Serial.println("Sent payload succesfully");
+
 }
 
 bool isScheduledTime() {
@@ -526,5 +554,35 @@ time_t getTimeUntilNextScheduledReading() {
 
   return secondsUntilNext;
 }
+
+
+
+void initializeLoRa() {
+  #ifdef  RADIO_TCXO_ENABLE
+    pinMode(RADIO_TCXO_ENABLE, OUTPUT);
+    digitalWrite(RADIO_TCXO_ENABLE, HIGH);
+  #endif
+
+  Serial.println("Initializing LoRa....");
+
+  LoRa.setPins(RADIO_CS_PIN, RADIO_RST_PIN, RADIO_DIO0_PIN);
+  if (!LoRa.begin(CONFIG_RADIO_FREQ * 1000000)) 
+  {
+    Serial.println("Starting LoRa failed!");
+    while (1);
+  }
+
+  LoRa.setTxPower(CONFIG_RADIO_OUTPUT_POWER);
+  LoRa.setSignalBandwidth(CONFIG_RADIO_BW * 1000);
+  LoRa.setSpreadingFactor(10);
+  LoRa.setPreambleLength(16);
+  LoRa.setSyncWord(0xAB);
+  LoRa.disableCrc();
+  LoRa.disableInvertIQ();
+  LoRa.setCodingRate4(7);
+  Serial.println("LoRa Initialized succesfully");
+}
+
+
 
 
