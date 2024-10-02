@@ -66,7 +66,7 @@ RTC_DATA_ATTR time_t lastSyncTime = 0;
 const time_t syncInterval = 86400;  // Sync time every 24 hours
 
 // Scheduled times for soil moisture readings (in minutes since midnight)
-const int scheduledTimes[] = { (17 * 60) + 13, (17 * 60) + 17 }; // 17:10  and 17:13 
+const int scheduledTimes[] = { (17 * 60) + 35, (17 * 60) + 37 }; // 17:10  and 17:13 
 
 void setup() {
   Serial.begin(115200);
@@ -153,15 +153,7 @@ void loop() {
       // Update last sync time
       lastSyncTime = time(NULL);
 
-      // Calculate time until next scheduled reading
-      time_t sleepTime = getTimeUntilNextScheduledReading();
-
-      Serial.print("Going to sleep for ");
-      Serial.print(sleepTime);
-      Serial.println(" seconds.");
-
-      esp_sleep_enable_timer_wakeup(sleepTime * 1000000LL);
-      esp_deep_sleep_start();
+      // Do not go to sleep here; wait for GPS to be turned off manually
     }
   }
 
@@ -181,6 +173,7 @@ void loop() {
   // Continuously check the battery status and update the placeholder battery percentage in gpsData
   checkBatteryStatus();
 }
+
 
 void handleButtonPress() {
   int reading = digitalRead(buttonPin);
