@@ -237,7 +237,7 @@ void loop() {
             storeGPSData();
   
             // Build a new combined array
-            String combinedArray = recv + "," + gpsData[0] + "," + gpsData[1] + "," + gpsData[2]+ "," + gpsData[3]+ "," + LoRa.packetRssi()+ "," + LoRa.packetSnr()+ "," + LoRa.parsePacket();
+            String combinedArray = recv + "," + gpsData[0] + "," + gpsData[1] + "," + gpsData[2]+ "," + gpsData[3]+ "," + LoRa.packetRssi()+ "," + LoRa.packetSnr()+ "," + String(packetSize);
             Serial.println("Combined array: " + combinedArray);
 
             // Publish the combined array to AWS IoT
