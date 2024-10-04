@@ -136,11 +136,13 @@ void storeGPSData() {
     gpsData[0] = "gt1";
     
     // Store GPS data into the array as a single string
-    gpsData[1] = String(gps.location.lat(), 6);  // Latitude, Longitude
-    gpsData[2] = String(gps.location.lng(), 6);
+    gpsData[1] = String(gps.location.lat(), 6);  // Latitude
+    gpsData[2] = String(gps.location.lng(), 6);  // Longitude
 
     // Print received GPS coordinates
-    Serial.print("Storing Latitude and Longitude: "); Serial.println(gpsData[1]);
+    Serial.print("Storing Latitude: "); Serial.println(gpsData[1]);
+    Serial.print("Storing Longitude: "); Serial.println(gpsData[2]);
+
 
     // Print received time
     if (gps.time.isValid()) {
@@ -193,54 +195,55 @@ void publishMessage(const String& combinedArray) {
 }
 
 void loop() {
-    // 确保 MQTT 客户端在循环中运行
+    // Ensure the MQTT client runs in the loop
     client.loop(); 
 
-    // 检查 Wi-Fi 连接
+    // Check Wi-Fi connection
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("Wi-Fi disconnected, attempting to reconnect...");
         connectToWiFi();
     }
 
-    // 检查 MQTT 连接
+    // Check MQTT connection
     if (!client.connected()) {
         Serial.println("AWS IoT disconnected, attempting to reconnect...");
         connectAWS();
     }
 
-    // 尝试接收 GPS 数据
+    // Try to receive GPS data
     while (GPS.available()) {
         gps.encode(GPS.read());
     }
 
-    // 检查 GPS 数据的有效性
+    // Check the validity of GPS data
     if (gps.location.isValid() && gps.time.isValid()) {
-        // 读取 LoRa 数据包
-        int packetSize = LoRa.parsePacket();
 
-        // 如果接收到 LoRa 数据包
+        // Read LoRa data packet
+        int packetSize = LoRa.parsePacket();
+        
+        // If a LoRa data packet is received
         if (packetSize) {
-            String recv = ""; // 初始化接收字符串
+            String recv = ""; // Initialize the received string
             Serial.print("Received packet: ");
             while (LoRa.available()) {
                 recv += (char)LoRa.read();
             }
 
-            // 打印接收到的数组
+            // Print the received array
             Serial.print("Received array: ");
             Serial.println(recv);
 
-            // 存储 GPS 数据
+            // Store GPS data
             storeGPSData();
-
-            // 构建新的组合数组
-            String combinedArray = recv + "," + gpsData[0] + "," + gpsData[1] + "," + gpsData[2]+ "," + gpsData[3];
+  
+            // Build a new combined array
+            String combinedArray = recv + "," + gpsData[0] + "," + gpsData[1] + "," + gpsData[2]+ "," + gpsData[3]+ "," + LoRa.packetRssi()+ "," + LoRa.packetSnr()+ "," + LoRa.parsePacket();
             Serial.println("Combined array: " + combinedArray);
 
-            // 将组合数组发布到 AWS IoT
+            // Publish the combined array to AWS IoT
             publishMessage(combinedArray);
 
-            // 继续监听下一个 LoRa 数据包
+            // Continue listening for the next LoRa data packet
             LoRa.receive();
         }
     } else {
@@ -248,3 +251,4 @@ void loop() {
     }
      delay(1000);
 }
+
