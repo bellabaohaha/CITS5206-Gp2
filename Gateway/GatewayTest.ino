@@ -38,7 +38,6 @@ PubSubClient client(net);
 
 // Variables
 String gpsData[4]; // [0] = "gt1", [1] = Latitude, [2] = Longitude, [3] = Time (HH:MM:SS)
-bool packetProcessed = false; // Flag to track if the packet has been processed
 
 void setup() {
     setupBoards();
@@ -137,10 +136,8 @@ void storeGPSData() {
     gpsData[0] = "gt1";
     
     // Store GPS data into the array as a single string
-    gpsData[1] = String(gps.location.lat(), 6) + "; " + String(gps.location.lng(), 6);  // Latitude, Longitude
-
-    // Trim any potential leading or trailing spaces from the longitude
-    gpsData[1].trim();  // Ensure no spaces affect the output
+    gpsData[1] = String(gps.location.lat(), 6);  // Latitude, Longitude
+    gpsData[2] = String(gps.location.lng(), 6);
 
     // Print received GPS coordinates
     Serial.print("Storing Latitude and Longitude: "); Serial.println(gpsData[1]);
@@ -149,15 +146,14 @@ void storeGPSData() {
     if (gps.time.isValid()) {
         // Format time as "HH:MM:SS"
         String timeString = String(gps.time.hour() + 8) + ":" + String(gps.time.minute()) + ":" + String(gps.time.second());
-        gpsData[2] = timeString; // Store formatted time
+        gpsData[3] = timeString; // Store formatted time
         Serial.print("Storing Time (HH:MM:SS): ");
-        Serial.println(gpsData[2]);
+        Serial.println(gpsData[3]);
     } else {
-        gpsData[2] = "00:00:00"; // Set to default if time is not valid
+        gpsData[3] = "00:00:00"; // Set to default if time is not valid
         Serial.println("Invalid GPS time.");
     }
 }
-
 
 void publishMessage(const String& combinedArray) {
     if (client.connected()) {
@@ -196,48 +192,59 @@ void publishMessage(const String& combinedArray) {
     }
 }
 
-
-
 void loop() {
-    // Check for incoming LoRa packets
-    int packetSize = LoRa.parsePacket();
+    // 确保 MQTT 客户端在循环中运行
+    client.loop(); 
 
-    // Simulate receiving a packet
-    if (!packetProcessed && packetSize == 0) {
-        packetSize = 1;
+    // 检查 Wi-Fi 连接
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("Wi-Fi disconnected, attempting to reconnect...");
+        connectToWiFi();
     }
 
-    if (packetSize) {
-        Serial.print("Received packet: ");
-        String recv = "";
-        while (LoRa.available()) {
-            recv += (char)LoRa.read();
-        }
+    // 检查 MQTT 连接
+    if (!client.connected()) {
+        Serial.println("AWS IoT disconnected, attempting to reconnect...");
+        connectAWS();
+    }
 
-        // Simulating received data
-        String receivedArray = "sb1,2024-09-12,12:34:56,lati,longit,75%,10,10,30,55,50,60";  // Simulated received array
-        Serial.print("Simulated received array: ");
-        Serial.println(receivedArray);
+    // 尝试接收 GPS 数据
+    while (GPS.available()) {
+        gps.encode(GPS.read());
+    }
 
-        // Read GPS data
-        while (GPS.available()) {
-            gps.encode(GPS.read());
-        }
+    // 检查 GPS 数据的有效性
+    if (gps.location.isValid() && gps.time.isValid()) {
+        // 读取 LoRa 数据包
+        int packetSize = LoRa.parsePacket();
 
-        // Process and store GPS data
-        if (gps.location.isValid() && gps.time.isValid()) {
+        // 如果接收到 LoRa 数据包
+        if (packetSize) {
+            String recv = ""; // 初始化接收字符串
+            Serial.print("Received packet: ");
+            while (LoRa.available()) {
+                recv += (char)LoRa.read();
+            }
+
+            // 打印接收到的数组
+            Serial.print("Received array: ");
+            Serial.println(recv);
+
+            // 存储 GPS 数据
             storeGPSData();
 
-            // Construct the new combined array
-            String combinedArray = receivedArray + "," + gpsData[0] + "," + gpsData[1] + "," + gpsData[2];
+            // 构建新的组合数组
+            String combinedArray = recv + "," + gpsData[0] + "," + gpsData[1] + "," + gpsData[2]+ "," + gpsData[3];
             Serial.println("Combined array: " + combinedArray);
 
-            // Publish the combined array to AWS IoT
+            // 将组合数组发布到 AWS IoT
             publishMessage(combinedArray);
-        } else {
-            Serial.println("Invalid GPS data or time.");
-        }
 
-        packetProcessed = true; // Set the flag to true after processing the packet
+            // 继续监听下一个 LoRa 数据包
+            LoRa.receive();
+        }
+    } else {
+        Serial.println("Waiting for valid GPS data...");
     }
+     delay(1000);
 }
